@@ -849,6 +849,7 @@ static size_t ZSTDMT_createCompressionJob(ZSTDMT_CCtx* zcs, size_t srcSize, unsi
         size_t const newDictSize = MIN(srcSize + zcs->dictSize, zcs->targetDictSize);
         zcs->inBuff.buffer = ZSTDMT_getBuffer(zcs->bufPool);
         if (zcs->inBuff.buffer.start == NULL) {   /* not enough memory to allocate next input buffer */
+            pthread_mutex_unlock(&zcs->jobs[jobID].srcCanbeReleased);
             ZSTDMT_waitForAllJobsCompleted(zcs);
             ZSTDMT_releaseAllJobResources(zcs);
             return ERROR(memory_allocation);
